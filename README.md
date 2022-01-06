@@ -93,3 +93,25 @@ Disclaimer: All scripts in this repository are written for their singular
 purpose. Little attempt has been made to properly document, structure,
 generalise or clean them up.
 
+
+
+### Keeping this Git repository sane
+If you clone this repository and regenerate the figures, Git will claim that
+the PDF figures have changed:
+```bash
+python=/path/to/python make
+git status
+```
+However (unless something has gone wrong), only the meta data inside the PDFs
+have changed:
+```bash
+git diff --text figure/*
+```
+We thus do not want to include changes to the PDFs as actual changes to
+the repository. However, since the PDFs are committed as part of
+the repository, adding them to `.gitignore` will not help.
+Instead do the following:
+```bash
+git update-index --assume-unchanged figure/*
+```
+
