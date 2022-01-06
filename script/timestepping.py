@@ -652,6 +652,6 @@ draw_particle('drift', 8, 'k', hatch=colors[0])
 
 # Save figure
 set_axis()
-plt.savefig('../figure/.timestepping.pdf', dpi=350)
+plt.savefig('../figure/.timestepping.pdf')
 os.system('cd ../figure && pdfcrop --margins 0.5 .timestepping.pdf timestepping.pdf >/dev/null && rm -f .timestepping.pdf')
 
