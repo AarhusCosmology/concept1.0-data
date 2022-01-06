@@ -8,7 +8,7 @@ figure:
 	@script/generate $(python)
 
 clean-figure:
-	$(RM) figure/* figure/.[^.]*
+	$(RM) figure/*.pdf figure/.[^.]*.pdf
 
 clean-pickle:
 	$(RM) -r .pickle

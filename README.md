@@ -37,6 +37,9 @@ directly). The figures are then created from the processed data.
   make clean
   ```
 
+Note that `figure/abspower.png` (displayed within this README) will not be
+removed by any of these.
+
 
 #### Required libraries and tools
 The figure generation requires the following libraries and tools to be
