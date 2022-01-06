@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+this_file="$(readlink -f "${BASH_SOURCE[0]}")"
+this_dir="$(dirname "${this_file}")"
+cd "${this_dir}"
+
+set -e
+
+python="$1"
+if [ -z "${python}" ]; then
+    echo "You must supply the generate script with the Python interpreter to use"
+    exit 1
+fi
+
+get_sha() {
+    pdf="$1"
+    if [ -f "${pdf}" ]; then
+        sha="$(grep -v "CreationDate\|CreateDate\|ModDate\|ID \[\|uuid:" --text "${pdf}" | sha1sum)"
+        sha="${sha%% *}"
+        echo "${sha}"
+    fi
+}
+
+mkdir -p ../figure
+for py in *.py; do
+    cd "${this_dir}/../figure"
+    if [ "${py}" == "helper.py" ]; then
+        continue
+    fi
+    printf "${py}"
+    pdf="${py%.*}.pdf"
+    sha_old=$(get_sha "${pdf}")
+    (cd "${this_dir}" && "${python}" -B "${py}")
+    mv "${pdf}" ".${pdf}"
+    gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default -dNOPAUSE -dQUIET -dBATCH -dDetectDuplicateImages -dCompressFonts=true -r150 -sOutputFile="${pdf}" ".${pdf}"
+    rm -f ".${pdf}"
+    sha_new=$(get_sha "${pdf}")
+    [ "${sha_old}" != "${sha_new}" ] && printf " (changed)"
+    echo
+done
+

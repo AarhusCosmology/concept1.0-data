@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+concept_dir="/home/jmd/concept"
+python="python"
+
+this_file="$(readlink -f "${BASH_SOURCE[0]}")"
+this_dir="$(dirname "${this_file}")"
+cd "${this_dir}"
+
+# Get node list for supplied job ID
+jobid=$1
+if [ -z "$jobid" ]; then
+    echo "You must provide a job ID!" | tee shutdown_msg
+    exit 1
+fi
+info="$(squeue -o '%u %A %N %t' | grep "^$USER" | grep "${jobid}" || :)"
+if [ -z "${info}" ]; then
+    echo "No running/queued job $jobid found!" | tee shutdown_msg
+    exit 1
+fi
+sleep_time=60 # 300
+while :; do
+    state=$(echo "${info}" | awk '{print $NF}')
+    if [ "$state" != "PD" ]; then
+        break
+    fi
+    sleep $sleep_time
+    info="$(squeue -o '%u %A %N %t' | grep "^$USER" | grep "${jobid}" || :)"
+done
+if [ "$state" != "R" ]; then
+    echo "Job $jobid is not running" | tee shutdown_msg
+    exit 1
+fi
+nodelist="$(echo $info | awk '{print $3}')"
+nodelist="$("${python}" -c "
+import re
+s = '${nodelist}'.replace(' ', '')
+s = re.sub(
+    r'\[(.*?)\]',
+    lambda m: '[{}]'.format(m.group(1).replace(',', ';')),
+    s,
+)
+nodes = []
+for node in s.split(','):
+    if '[' in node:
+        index = node.index('[')
+        prefix = node[:index]
+        for suffix in node[(index+1):-1].split(';'):
+            if '-' in suffix:
+                a, b = suffix.split('-')
+                for i in range(int(a), int(b) + 1):
+                    j = str(i)
+                    if len(j) == 1:
+                        j = '0' + j
+                    nodes.append(prefix + j)
+            else:
+                nodes.append(prefix + suffix)
+    else:
+        nodes.append(node)
+print(' '.join(nodes))
+")"
+if [ -z "$nodelist" ]; then
+    echo "Something went wrong trying to obtain the node list" | tee shutdown_msg
+    exit 1
+fi
+
+# Monitor memory of each process
+mkdir -p mem/$jobid
+cd mem/$jobid
+while :; do
+    clock=$(date +%s)
+    i=0
+    for node in ${nodelist}; do
+        info="$(ssh -o StrictHostKeyChecking=no $node ps aux 2>/dev/null | grep "^$USER" | grep "${concept_dir}" | grep -v ' srun\| tee')"
+        nprocs_in_node=$(echo "$info" | awk '{print $11}' | wc -l)
+        echo "$info" | awk '{print $5, $6}' > .vsz_rss
+        pids="$(echo "$info" | awk '{print $2}' | xargs)"
+        echo "
+pss=\"\"
+for pid in ${pids}; do
+    new=\$(cat /proc/\${pid}/smaps | grep 'Pss:' | awk '{tot+=\$2} END {print tot}')
+    pss=\"\${pss} \${new}\"
+done
+echo \"\${pss}\" > \"${PWD}/.pss\"
+" > .get_pss
+        ssh -o StrictHostKeyChecking=no ${node} bash ${PWD}/.get_pss 2>/dev/null
+        filename="${i}_${clock}"
+        "${python}" -c "
+from __future__ import print_function
+import numpy as np
+# VSZ, RSS
+mem = np.loadtxt('.vsz_rss')*2**10  # ps uses kb
+if mem.ndim == 1:
+    mem = np.reshape(mem, (1, 2))
+VSZ = mem[:, 0]
+RSS = mem[:, 1]
+VSZ_tot = np.sum(VSZ)/2**30
+RSS_tot = np.sum(RSS)/2**30
+# PSS
+PSS = np.loadtxt('.pss')*2**10  # smaps uses kb
+if PSS.ndim == 0:
+    PSS = np.array([PSS])
+PSS_tot = np.sum(PSS)/2**30
+print('Total memory used by the ${nprocs_in_node} processes in ${node}:', '{:.1f} GB'.format(VSZ_tot), '(VSZ),', '{:.1f} GB'.format(RSS_tot), '(RSS),', '{:.1f} GB'.format(PSS_tot), '(PSS)')
+np.savetxt('${filename}', np.array((VSZ, RSS, PSS)).T, fmt='%d')
+"
+        ((i += 1))
+    done
+    sleep $sleep_time
+    if ! squeue -o '%u %A' | grep "^$USER" | grep "${jobid}" >/dev/null; then
+        echo "Job $jobid no longer running" | tee shutdown_msg
+        exit 0
+    fi
+done
+
