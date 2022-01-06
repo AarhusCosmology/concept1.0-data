@@ -5,6 +5,8 @@ the paper
 which is the primary code paper for the
 [CO*N*CEPT code](https://github.com/jmd-dk/concept).
 
+![power spectra](figure/abspower.png)
+
 
 
 ### Generating figures
@@ -57,9 +59,11 @@ though many other versions will work as well.
 - GNU coreutils 8.30
 
 The above versions of Python itself and Python packages coincide with the
-versions shipping with CO*N*CEPT 1.0.1, so you may use this Python to build
-the figures. Note however that the Noise package is not installed as part
-of CO*N*CEPT.
+versions shipping with
+[CO*N*CEPT 1.0.1](https://github.com/jmd-dk/concept/tree/v1.0.1). If you have
+this version of CO*N*CEPT installed, you may then use its Python distribution
+to build the figures. You will however still need to install the Noise
+package yourself.
 
 
 
@@ -97,13 +101,13 @@ generalise or clean them up.
 
 ### Keeping this Git repository sane
 If you clone this repository and regenerate the figures, Git will claim that
-the PDF figures have changed:
+these have changed:
 ```bash
 python=/path/to/python make
 git status
 ```
-However (unless something has gone wrong), only the meta data inside the PDFs
-have changed:
+However (unless something has gone wrong), only the meta data inside these
+PDFs will have changed:
 ```bash
 git diff --text figure/*
 ```
