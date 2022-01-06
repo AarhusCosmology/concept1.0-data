@@ -32,7 +32,7 @@ directly). The figures are then created from the processed data.
   ```bash
   make clean-pickle
   ```
-- The figures as well as the pickled data can be removed simultaneously via
+- The figures as well as the pickled data can be simultaneously removed via
   ```bash
   make clean
   ```
