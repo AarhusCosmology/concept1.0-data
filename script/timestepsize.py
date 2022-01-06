@@ -73,16 +73,16 @@ def parse_log(jobid):
     Δt_max = np.array(Δt_max)
     Δt_max[Δt_max == Δt_dynamical] *= 0.056/0.057
     Δt_dynamical *= 0.056/0.057
-    def correct_end(arr, hmm=None):
+    def correct_end(arr, limiter=None):
         arr = np.array(arr)
-        if hmm == 'hubble':
+        if limiter == 'hubble':
             arr[-1] *= 1.025
             return arr
-        if hmm == 'p3m':
+        if limiter == 'p3m':
             arr[-2] *= 0.998
             arr[-1] *= 1.010
             return arr
-        if hmm == 'late':
+        if limiter == 'late':
             arr[-1] *= 1.022
             return arr
         i = -2
