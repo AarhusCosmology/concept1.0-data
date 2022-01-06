@@ -27,7 +27,7 @@ for py in *.py; do
     if [ "${py}" == "helper.py" ]; then
         continue
     fi
-    printf "${py}"
+    printf "${py} "
     pdf="${py%.*}.pdf"
     sha_old=$(get_sha "${pdf}")
     (cd "${this_dir}" && "${python}" -B "${py}")
@@ -35,7 +35,9 @@ for py in *.py; do
     gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default -dNOPAUSE -dQUIET -dBATCH -dDetectDuplicateImages -dCompressFonts=true -r150 -sOutputFile="${pdf}" ".${pdf}"
     rm -f ".${pdf}"
     sha_new=$(get_sha "${pdf}")
-    [ "${sha_old}" != "${sha_new}" ] && printf " (changed)"
+    if [ -n "${sha_old}" ] && [ "${sha_old}" != "${sha_new}" ]; then
+        printf "(changed)"
+    fi
     echo
 done
 
