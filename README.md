@@ -112,13 +112,13 @@ git status
 However (unless something has gone wrong), only the meta data inside these
 PDFs will have changed:
 ```bash
-git diff --text figure/*
+git diff --text figure/*.pdf
 ```
 We thus do not want to include changes to the PDFs as actual changes to
 the repository. However, since the PDFs are committed as part of
 the repository, adding them to `.gitignore` will not help.
 Instead do the following:
 ```bash
-git update-index --assume-unchanged figure/*
+git update-index --assume-unchanged figure/*.pdf
 ```
 
