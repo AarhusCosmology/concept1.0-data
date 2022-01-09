@@ -1,0 +1,181 @@
+# This parameter file contains everything needed to run CO𝘕CEPT simulations
+# matching those used for the figures within the CO𝘕CEPT 1.0 paper.
+# - Parameters which take on different values between simulations are
+#   listed in the next section, with all used values given. For a given
+#   simulation, choose a specific one of these values.
+#   - Initially (see https://github.com/AarhusCosmology/concept1.0-data/param/concept)
+#     the parameter values are chosen as to reproduce the simulation used for
+#     Figure 4 (absolute power spectra).
+# - For all simulations, we first create an initial condition snapshot.
+#   To do this, specify the variables in the next section accordingly,
+#   set _gen to True and run CO𝘕CEPT with this parameter file. Once done,
+#   change _gen to False and run CO𝘕CEPT with this parameter file once more
+#   to carry out the actual simulation.
+
+# Generate initial condition snapshot instead of
+# loading it from disk and running a simulation?
+_gen = True
+
+
+
+#################################################################
+# Simulation specifics. A simulation used within a paper figure #
+# can be achieved by setting the _index variables accordingly.  #
+#################################################################
+# Run with radiation-less background and use cell-vertex mode?
+_index = 1
+_gadget_mode = [False, True][_index]
+
+# Size of simulation (cube root of number of particles)
+_index = 7
+_size = [204, 256, 322, 408, 512, 640, 800, 1024, 1280, 1536, 2048][_index]
+
+# Box size in units of Mpc/h
+_index = 11
+_box = [4096, 3072, 2560, 2048, 1600, 1536, 1280, 1024, 816, 768, 644, 512, 408, 384, 256, 192, 128, 96][_index]
+
+# Short-range cut-off scale
+_index = 0
+_xr = [4.5, 5.5][_index]
+
+# Subtile decomposition
+_index = 0
+_subtiling = ['automatic', 1, 2, 3, 4, 5, 6, 7, 8, 9][_index]
+
+# Use interlacing when computing power spectra?
+# (Interlacing has been used for all power spectra presented in the paper,
+# though it has been turned off for the simulations used for the figure
+# about memory consumption.)
+_index = 0
+_powerspec_interlace = [True, False][_index]
+
+
+
+##################################################
+# Below follows the actual parameter definitions #
+##################################################
+# Initial redshift
+_z_begin = 99
+
+# Redshifts at which to dump power spectra
+_z_out = [_z_begin, 10, 5, 3, 2, 1, 0.5, 0]
+
+# Input/output
+_dirbase = f'concept1.0/size{_size}_box{_box}'
+_icsnap_dir = f'{path.ic_dir}/{_dirbase}'
+_outdir = f'{path.output_dir}/{_dirbase}_xr{_xr}_powerspecinterlace{_powerspec_interlace}_nprocs{nprocs}'
+if _gen:
+    initial_conditions = {
+        'species': 'matter',
+        'N'      : _size**3,
+    }
+else:
+    initial_conditions = f'{_icsnap_dir}/snapshot_a={a_begin:.2f}'
+snapshot_type = 'gadget'
+output_dirs = {
+    'snapshot' : _icsnap_dir,
+    'powerspec': _outdir,
+}
+if _gen:
+    output_times = {
+        'snapshot': a_begin,
+    }
+else:
+    output_times = {
+        'powerspec': [1/(1 + _z) for _z in _z_out],
+    }
+
+# Numerics
+boxsize = _box*Mpc/h
+potential_options = {
+    'gridsize': {
+        'global': {
+            'gravity': {
+                'p3m': 2*_size,
+            },
+        },
+        'matter': {
+            'gravity': {
+                'p3m': (2*_size, 2*_size),
+            },
+        },
+    },
+    'interpolation': {
+        'gravity': {
+            'p3m': 'CIC',
+        },
+    },
+    'differentiation': {
+        'matter': {
+            'gravity': {
+                'p3m': 4,
+            },
+        },
+    },
+}
+shortrange_params = {
+    'gravity': {
+        'scale'    : '1.25*boxsize/gridsize',
+        'range'    : f'{_xr}*scale',
+        'subtiling': _subtiling,
+    },
+}
+powerspec_options = {
+    'upstream gridsize': {
+        'matter': '2*cbrt(N)',
+    },
+    'interpolation': {
+        'matter': 'PCS',
+    },
+    'interlace': {
+        'matter': _powerspec_interlace,
+    },
+    'binsize': {
+        'matter': {
+            '1*k_min': 1*π/boxsize,
+            '5*k_min': 2*π/boxsize,
+        },
+    },
+}
+k_modes_per_decade = {
+    3e-3/Mpc: 10,
+    3e-2/Mpc: 30,
+    3e-1/Mpc: 30,
+    1   /Mpc: 10,
+}
+
+# Cosmology
+H0 = 67*km/(s*Mpc)
+Ωcdm = 0.27
+Ωb = 0.049
+a_begin = 1/(1 + _z_begin)
+primordial_spectrum = {
+    'A_s'  : 2.1e-9,
+    'n_s'  : 0.96,
+    'α_s'  : 0,
+    'pivot': 0.05/Mpc,
+}
+
+# Physics
+select_forces = {
+    'matter': {'gravity': 'p3m'},
+}
+softening_kernel = 'spline'
+select_softening_length = {
+    'matter': '0.03*boxsize/cbrt(N)',
+}
+
+# Simulation
+fftw_wisdom_rigor = 'patient'  # note that this introduces a slight indeterminism
+fftw_wisdom_reuse = True
+fftw_wisdom_share = True
+random_generator = 'PCG64'
+random_seed = 0
+primordial_amplitude_fixed = True
+primordial_phase_shift = 0
+cell_centered = not _gadget_mode
+
+# Debugging
+print_load_imbalance = 'full'
+enable_class_background = _gen or not _gadget_mode
+

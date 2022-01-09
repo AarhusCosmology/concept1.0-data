@@ -1,0 +1,87 @@
+%---- Relevant files
+InitCondFile        /path/to/concept/ic/concept1.0/size1024_box512/snapshot_a=0.01/snapshot
+OutputDir           output
+EnergyFile          energy.txt
+InfoFile            info.txt
+TimingsFile         timings.txt
+CpuFile             cpu.txt
+RestartFile         restart
+SnapshotFileBase    snapshot
+OutputListFilename  outputlist
+
+%---- CPU time-limit
+TimeLimitCPU     999999999
+ResubmitOn       0
+ResubmitCommand  scriptfile
+
+%---- Code options
+ICFormat                 2
+SnapFormat               2
+ComovingIntegrationOn    1
+TypeOfTimestepCriterion  0
+OutputListOn             1
+PeriodicBoundariesOn     1
+
+%---- Caracteristics of run
+TimeBegin    0.01
+TimeMax      1.0
+Omega0       0.319
+OmegaLambda  0.681
+OmegaBaryon  0.049
+HubbleParam  0.67
+BoxSize      512000.0  % kpc/h
+
+%---- Output frequency
+TimeBetSnapshot            0
+TimeOfFirstSnapshot        0
+CpuTimeBetRestartFile      999999999
+TimeBetStatistics          999999999
+NumFilesPerSnapshot        7
+NumFilesWrittenInParallel  1
+
+%---- Accuracy of time integration
+ErrTolIntAccuracy      0.025
+MaxRMSDisplacementFac  0.25
+CourantFac             0.15
+MaxSizeTimestep        0.03
+MinSizeTimestep        0.0
+
+%---- Tree algorithm, force accuracy, domain update frequency
+ErrTolTheta                0.7
+TypeOfOpeningCriterion     1
+ErrTolForceAcc             0.005  % standard: 0.005;  high precision: 0.001
+TreeDomainUpdateFrequency  0.1    % standard: 0.1;    high precision: 0.05
+
+%---- Further parameters of SPH
+DesNumNgb           33
+MaxNumNgbDeviation  2
+ArtBulkViscConst    0.8
+InitGasTemp         0.0
+MinGasTemp          0.0
+
+%---- Memory allocation
+PartAllocFactor  2.0
+TreeAllocFactor  1.0
+BufferSize       100
+
+%---- System of units
+UnitLength_in_cm          3.0856775814913673e+21  % kpc/cm
+UnitMass_in_g             1.98841e+43             % (1e+10*m_sun)/g
+UnitVelocity_in_cm_per_s  100000.0                % (km/s)/(cm/s)
+GravityConstantInternal   0
+
+%---- Softening lengths
+MinGasHsmlFractional   0.0
+SofteningGas           15.0  % kpc/h
+SofteningHalo          15.0  % kpc/h
+SofteningDisk          15.0  % kpc/h
+SofteningBulge         15.0  % kpc/h
+SofteningStars         15.0  % kpc/h
+SofteningBndry         15.0  % kpc/h
+SofteningGasMaxPhys    15.0  % kpc/h
+SofteningHaloMaxPhys   15.0  % kpc/h
+SofteningDiskMaxPhys   15.0  % kpc/h
+SofteningBulgeMaxPhys  15.0  % kpc/h
+SofteningStarsMaxPhys  15.0  % kpc/h
+SofteningBndryMaxPhys  15.0  % kpc/h
+

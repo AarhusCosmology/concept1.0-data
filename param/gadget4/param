@@ -1,0 +1,89 @@
+%---- Relevant files
+InitCondFile        /path/to/concept/ic/concept1.0/size1024_box512/snapshot_a=0.01/snapshot
+OutputDir           output
+SnapshotFileBase    snapshot
+OutputListFilename  outputlist
+
+%---- File formats
+ICFormat    2
+SnapFormat  2
+
+%---- CPU-time limits
+TimeLimitCPU           999999999
+CpuTimeBetRestartFile  999999999
+
+%---- Memory alloction
+MaxMemSize  5000  % in MByte
+
+%---- Characteristics of run
+TimeBegin  0.01
+TimeMax    1.0
+
+%---- Basic code options that set the type of simulation
+ComovingIntegrationOn  1
+
+%---- Cosmological parameters
+Omega0       0.319
+OmegaLambda  0.681
+OmegaBaryon  0.049
+HubbleParam  0.67
+Hubble       0.1
+BoxSize      512000.0  % kpc/h
+
+%---- Output frequency and output parameters
+OutputListOn              1
+TimeBetSnapshot           0.0
+TimeOfFirstSnapshot       0.0
+TimeBetStatistics         999999999
+NumFilesPerSnapshot       7
+MaxFilesWithConcurrentIO  1
+
+%---- Accuracy of time integration
+ErrTolIntAccuracy  0.025
+CourantFac         0.15
+MaxSizeTimestep    0.03
+MinSizeTimestep    0.0
+
+%---- Tree algorithm, force accuracy, domain update frequency
+TypeOfOpeningCriterion            1
+ErrTolTheta                       0.7
+ErrTolThetaMax                    1.0
+ErrTolForceAcc                    0.005
+TopNodeFactor                     3.0
+ActivePartFracForNewDomainDecomp  0.01
+
+%---- Initial density estimate
+DesNumNgb           64
+MaxNumNgbDeviation  1
+
+%---- System of units
+UnitLength_in_cm          3.0856775814913673e+21  % kpc/cm
+UnitMass_in_g             1.98841e+43             % (1e+10*m_sun)/g
+UnitVelocity_in_cm_per_s  100000.0                % (km/s)/(cm/s)
+GravityConstantInternal   0
+
+%---- Gravitational softening length
+SofteningComovingClass0    15.0  % kpc/h
+SofteningMaxPhysClass0     15.0  % kpc/h
+SofteningComovingClass1    15.0  % kpc/h
+SofteningMaxPhysClass1     15.0  % kpc/h
+SofteningComovingClass2    15.0  % kpc/h
+SofteningMaxPhysClass2     15.0  % kpc/h
+SofteningComovingClass3    15.0  % kpc/h
+SofteningMaxPhysClass3     15.0  % kpc/h
+SofteningComovingClass4    15.0  % kpc/h
+SofteningMaxPhysClass4     15.0  % kpc/h
+SofteningComovingClass5    15.0  % kpc/h
+SofteningMaxPhysClass5     15.0  % kpc/h
+SofteningClassOfPartType0  0
+SofteningClassOfPartType1  1
+SofteningClassOfPartType2  2
+SofteningClassOfPartType3  3
+SofteningClassOfPartType4  4
+SofteningClassOfPartType5  5
+
+%---- SPH
+ArtBulkViscConst  1.0
+MinEgySpec        0
+InitGasTemp       0
+
