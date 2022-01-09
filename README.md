@@ -66,7 +66,10 @@ versions shipping with
 [CO*N*CEPT 1.0.1](https://github.com/jmd-dk/concept/tree/v1.0.1). If you have
 this version of CO*N*CEPT installed, you may then use its Python distribution
 to build the figures. You will however still need to install the Noise
-package yourself.
+package:
+```bash
+(source concept && $python -m pip install noise==1.2.2)
+```
 
 
 
