@@ -47,7 +47,7 @@ installed on the system. With the exception of Python, all need to be located
 on `PATH`. The version numbers given are known to work,
 though many other versions will work as well.
 - Python 3.9.9
-  - NumPy 1.21.4
+  - NumPy 1.20.3, 1.21.4
   - SciPy 1.7.3
   - Matplotlib 3.5.0
   - CLASS 2.7.2
@@ -185,9 +185,9 @@ file). In order to obtain exactly the same particle realisation as used for
 the corresponding data included in this repository, you must use a NumPy
 version below 1.21, due to a
 [change](https://github.com/numpy/numpy/commit/d4a270640b451636c76cb7cff52cc5a1a8a12b6c)
-to the way random Rayleigh numbers are drawn. Thus, if you use CO*N*CEPT 1.0
-and wants to exactly replicate the power spectra included in this repository,
-make sure to first downgrade to e.g. NumPy 1.20.3:
+to the way random Rayleigh numbers are constructed. Thus, if you use CO*N*CEPT
+1.0 and wants to exactly replicate the power spectra included in this
+repository, make sure to first downgrade to e.g. NumPy 1.20.3:
 ```bash
 (source concept && $python -m pip install numpy==1.20.3)
 ```
